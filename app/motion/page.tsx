@@ -12,6 +12,7 @@ import {
 import motionLogo from "@/assets/logos/motion.svg";
 import { ArrowUpRight, RotateCw } from "lucide-react";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 const containerAnimations: Variants = {
     hidden: {
@@ -93,10 +94,55 @@ const boxCChildrenVariants: Variants = {
     },
 };
 
+const notificationsContainerVariants: Variants = {
+    uncollapsed: {
+        transition: { type: "spring", duration: 0.5, staggerChildren: 0.05 },
+    },
+    collapsed: {
+        transition: {
+            type: "spring",
+            duration: 0.3,
+            staggerChildren: 0.03,
+            staggerDirection: -1,
+        },
+    },
+};
+
+const notificationVariants: Variants = {
+    uncollapsed: (i: number) => ({
+        scale: 1,
+        opacity: 1,
+        y: 0,
+        transition: { type: "spring", duration: 0.4, delay: i * 0.04 },
+    }),
+    collapsed: (i: number) => ({
+        scale: 0.95 - i * 0.05, // top slightly bigger, bottom slightly smaller
+        opacity: 1 - i * 0.1,
+        y: `-${110 * i}%`,
+        transition: { type: "spring", duration: 0.3, delay: i * 0.02 },
+    }),
+};
+
+const notificationHeaderVariants: Variants = {
+    uncollapsed: {
+        opacity: 1,
+        y: 0,
+        filter: "blur(0px)",
+    },
+    collapsed: {
+        y: 10,
+        opacity: 0,
+        filter: "blur(10px)",
+    },
+};
+
 function MotionPage() {
     const { scrollYProgress } = useScroll();
     const percentMV = useTransform(scrollYProgress, (v) => Math.round(v * 100));
     const [percent, setPercent] = useState(0);
+    const [layoutButton, setLayoutButton] = useState(false);
+    const [selectedTab, setSelectedTab] = useState(1);
+    const [notificationsCollapsed, setNotificationsCollapsed] = useState(true);
 
     useMotionValueEvent(percentMV, "change", (v) => {
         setPercent(v);
@@ -131,6 +177,7 @@ function MotionPage() {
                     <a
                         href="https://motion.dev/docs/react"
                         className="flex items-center gap-1 hover:underline"
+                        target="_blank"
                     >
                         Documentation{" "}
                         <ArrowUpRight size={16} className="pt-0.5" />
@@ -297,6 +344,125 @@ function MotionPage() {
                                 {percent}%
                             </motion.p>
                         </div>
+                    </motion.div>
+                    {/* Box G */}
+                    <motion.div
+                        variants={containerChildrenAnimations}
+                        className="aspect-square border border-gray-400 rounded-lg p-4 flex items-center justify-center"
+                    >
+                        <button
+                            onClick={() => setLayoutButton(!layoutButton)}
+                            className="border-2 border-blue-400 rounded-full px-1 py-1 flex items-center w-16 cursor-pointer focus:ring-2 focus:ring-blue-300"
+                            style={{
+                                justifyContent:
+                                    "flex-" + (layoutButton ? "end" : "start"),
+                            }}
+                        >
+                            <motion.div
+                                layout
+                                className="size-6 rounded-full bg-blue-400"
+                                transition={{
+                                    type: "spring",
+                                    duration: 0.25,
+                                }}
+                            ></motion.div>
+                        </button>
+                    </motion.div>
+                    {/* Box H */}
+                    <motion.div
+                        variants={containerChildrenAnimations}
+                        className="aspect-square border border-gray-400 rounded-lg p-4 flex items-center justify-center"
+                    >
+                        <div className="flex items-center gap-4 border border-black rounded-full w-fit px-2 h-[50px] justify-center">
+                            <button
+                                className={cn([
+                                    "relative px-2 py-2 cursor-pointer",
+                                ])}
+                                onClick={() => setSelectedTab(1)}
+                            >
+                                Mathys{" "}
+                                {selectedTab === 1 && (
+                                    <motion.div
+                                        layoutId="movingborder"
+                                        className="absolute top-0 left-0 h-full w-full border border-black rounded-full"
+                                    ></motion.div>
+                                )}
+                            </button>
+                            <button
+                                className="relative px-2 py-2 cursor-pointer"
+                                onClick={() => setSelectedTab(2)}
+                            >
+                                Wilhelm{" "}
+                                {selectedTab === 2 && (
+                                    <motion.div
+                                        layoutId="movingborder"
+                                        className="absolute top-0 left-0 h-full w-full border border-black rounded-full"
+                                    ></motion.div>
+                                )}
+                            </button>
+                            <button
+                                className="relative px-2 py-2 cursor-pointer"
+                                onClick={() => setSelectedTab(3)}
+                            >
+                                Shae{" "}
+                                {selectedTab === 3 && (
+                                    <motion.div
+                                        layoutId="movingborder"
+                                        className="absolute top-0 left-0 h-full w-full border border-black rounded-full"
+                                    ></motion.div>
+                                )}
+                            </button>
+                            <button
+                                className="relative px-2 py-2 cursor-pointer"
+                                onClick={() => setSelectedTab(4)}
+                            >
+                                Euan{" "}
+                                {selectedTab === 4 && (
+                                    <motion.div
+                                        layoutId="movingborder"
+                                        className="absolute top-0 left-0 h-full w-full border border-black rounded-full"
+                                    ></motion.div>
+                                )}
+                            </button>
+                        </div>
+                    </motion.div>
+                    {/* Box I */}
+                    <motion.div
+                        variants={containerChildrenAnimations}
+                        className="aspect-square border border-gray-400 rounded-lg p-4 flex items-center justify-center"
+                    >
+                        <motion.div
+                            variants={notificationsContainerVariants}
+                            initial={"uncollapsed"}
+                            animate={
+                                notificationsCollapsed
+                                    ? "collapsed"
+                                    : "uncollapsed"
+                            }
+                            onClick={() =>
+                                setNotificationsCollapsed(
+                                    !notificationsCollapsed
+                                )
+                            }
+                            className="w-full h-full flex flex-col items-center relative gap-4"
+                        >
+                            <div className="w-full text-left pl-[10%]">
+                                <motion.h2
+                                    variants={notificationHeaderVariants}
+                                    className="text-xl text-black font-medium "
+                                >
+                                    Notifications
+                                </motion.h2>
+                            </div>
+                            {[0, 1, 2].map((i) => (
+                                <motion.div
+                                    key={i}
+                                    custom={i}
+                                    variants={notificationVariants}
+                                    className="bg-gray-700 rounded-lg h-[60px] w-4/5"
+                                />
+                            ))}
+                        </motion.div>
                     </motion.div>
                 </motion.div>
             </div>
