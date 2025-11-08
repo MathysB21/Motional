@@ -594,7 +594,10 @@ function MotionPage() {
                                     >
                                         <div className="px-5 pb-5 pt-1">
                                             This is just a test of how the
-                                            accordion works
+                                            accordion works. And this is to make
+                                            the message a bit longer so we can
+                                            see what happens when you add a
+                                            longer piece of content.
                                         </div>
                                     </motion.section>
                                 )}
@@ -604,7 +607,7 @@ function MotionPage() {
                     {/* Box L */}
                     <motion.div
                         variants={containerChildrenAnimations}
-                        className="aspect-square border border-gray-400 rounded-lg p-10 flex flex-col gap-3 items-center justify-center"
+                        className="aspect-square border border-gray-400 rounded-lg p-10 flex flex-col gap-3 items-center pt-[42%]"
                     >
                         <Loader2
                             size={36}
