@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import {
+    AnimatePresence,
     motion,
     stagger,
     useMotionValueEvent,
@@ -10,9 +11,10 @@ import {
     Variants,
 } from "motion/react";
 import motionLogo from "@/assets/logos/motion.svg";
-import { ArrowUpRight, RotateCw } from "lucide-react";
-import { useState } from "react";
+import { ArrowUpRight, ChevronDown, Loader2, RotateCw } from "lucide-react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { messages } from "@/lib/loading_messages";
 
 const containerAnimations: Variants = {
     hidden: {
@@ -136,6 +138,17 @@ const notificationHeaderVariants: Variants = {
     },
 };
 
+const initialOrder = ["#C1121F", "#FDF0D5", "#003049", "#669BBC"];
+
+function shuffle([...array]: string[]) {
+    return array.sort(() => Math.random() - 0.5);
+}
+
+function getRandomLoadingMessage() {
+    const randomId = Math.floor(Math.random() * messages.length);
+    return messages[randomId];
+}
+
 function MotionPage() {
     const { scrollYProgress } = useScroll();
     const percentMV = useTransform(scrollYProgress, (v) => Math.round(v * 100));
@@ -143,6 +156,11 @@ function MotionPage() {
     const [layoutButton, setLayoutButton] = useState(false);
     const [selectedTab, setSelectedTab] = useState(1);
     const [notificationsCollapsed, setNotificationsCollapsed] = useState(true);
+    const [backgroundColors, setBackgroundColors] = useState(initialOrder);
+    const [accordionOpen, setAccordionOpen] = useState(false);
+    const [currentLoadingMessage, setCurrentLoadingMessage] = useState(
+        messages[0]
+    );
 
     useMotionValueEvent(percentMV, "change", (v) => {
         setPercent(v);
@@ -161,6 +179,22 @@ function MotionPage() {
         setVersions((prev) => ({ ...prev, [id]: prev[id] + 1 }));
         console.log("Versions: ", versions);
     };
+
+    useEffect(() => {
+        const timeoutId = setTimeout(
+            () => setBackgroundColors(shuffle(backgroundColors)),
+            1000
+        );
+        return () => clearTimeout(timeoutId);
+    }, [backgroundColors]);
+
+    useEffect(() => {
+        const timeoutId = setTimeout(
+            () => setCurrentLoadingMessage(getRandomLoadingMessage()),
+            5000
+        );
+        return () => clearTimeout(timeoutId);
+    }, [currentLoadingMessage]);
 
     return (
         <main className="min-h-screen p-10 bg-zinc-200">
@@ -444,7 +478,7 @@ function MotionPage() {
                                     !notificationsCollapsed
                                 )
                             }
-                            className="w-full h-full flex flex-col items-center relative gap-4"
+                            className="w-full h-full flex flex-col items-center relative gap-4 cursor-pointer"
                         >
                             <div className="w-full text-left pl-[10%]">
                                 <motion.h2
@@ -463,6 +497,145 @@ function MotionPage() {
                                 />
                             ))}
                         </motion.div>
+                    </motion.div>
+                    {/* Box J */}
+                    <motion.div
+                        variants={containerChildrenAnimations}
+                        className="aspect-square border border-gray-400 rounded-lg p-4 flex items-center justify-center"
+                    >
+                        <ul className="w-fit h-fit grid grid-cols-2 gap-4 place-items-center">
+                            {backgroundColors.map((item) => (
+                                <motion.li
+                                    layout
+                                    transition={{
+                                        type: "spring",
+                                        damping: 20,
+                                        stiffness: 300,
+                                    }}
+                                    key={item}
+                                    className="w-[100px] rounded-2xl h-auto aspect-square"
+                                    style={{ backgroundColor: item }}
+                                ></motion.li>
+                            ))}
+                        </ul>
+                    </motion.div>
+                    {/* Box K */}
+                    <motion.div
+                        variants={containerChildrenAnimations}
+                        className="aspect-square border border-gray-400 rounded-lg p-4 flex items-center justify-center"
+                    >
+                        <motion.div
+                            transition={{
+                                type: "spring",
+                            }}
+                            onClick={() => setAccordionOpen(!accordionOpen)}
+                            className="w-full border rounded-2xl border-gray-400 cursor-pointer"
+                        >
+                            <header className="flex cursor-pointer list-none items-center justify-between gap-4 p-5relative p-5">
+                                <h3>Click here to open the accordion</h3>
+                                <motion.div
+                                    animate={{
+                                        rotate: accordionOpen ? 180 : 0,
+                                    }}
+                                    transition={{
+                                        duration: 0.2,
+                                        ease: "easeOut",
+                                    }}
+                                >
+                                    <ChevronDown className="size-6 shrink-0" />
+                                </motion.div>
+                            </header>
+                            <AnimatePresence initial={false}>
+                                {accordionOpen && (
+                                    <motion.section
+                                        initial={{
+                                            height: 0,
+                                            opacity: 0,
+                                            y: 10,
+                                            filter: "blur(10px)",
+                                        }}
+                                        animate={{
+                                            height: "auto",
+                                            opacity: 1,
+                                            y: 0,
+                                            filter: "blur(0px)",
+                                            transition: {
+                                                height: {
+                                                    duration: 0.2,
+                                                    ease: "easeOut",
+                                                },
+                                                opacity: {
+                                                    duration: 0.25,
+                                                    delay: 0.15,
+                                                },
+                                                filter: {
+                                                    duration: 0.25,
+                                                    delay: 0.15,
+                                                },
+                                            },
+                                        }}
+                                        exit={{
+                                            height: 0,
+                                            opacity: 0,
+                                            y: -10,
+                                            filter: "blur(10px)",
+                                            transition: {
+                                                height: {
+                                                    duration: 0.2,
+                                                    ease: "easeOut",
+                                                },
+                                                opacity: { duration: 0.25 },
+                                                filter: {
+                                                    duration: 0.25,
+                                                },
+                                            },
+                                        }}
+                                        style={{ overflow: "hidden" }}
+                                    >
+                                        <div className="px-5 pb-5 pt-1">
+                                            This is just a test of how the
+                                            accordion works
+                                        </div>
+                                    </motion.section>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    </motion.div>
+                    {/* Box L */}
+                    <motion.div
+                        variants={containerChildrenAnimations}
+                        className="aspect-square border border-gray-400 rounded-lg p-10 flex flex-col gap-3 items-center justify-center"
+                    >
+                        <Loader2
+                            size={36}
+                            className="animate-spin text-gray-600"
+                        />
+                        <AnimatePresence mode="wait">
+                            <motion.p
+                                key={currentLoadingMessage.replaceAll(" ", "-")}
+                                initial={{
+                                    opacity: 0,
+                                    y: 14,
+                                    filter: "blur(8px)",
+                                    scale: 0.95,
+                                }}
+                                animate={{
+                                    opacity: 1,
+                                    y: 0,
+                                    filter: "blur(0px)",
+                                    scale: 1,
+                                }}
+                                exit={{
+                                    opacity: 0,
+                                    y: -14,
+                                    filter: "blur(8px)",
+                                    scale: 1.2,
+                                }}
+                                className="text-center"
+                            >
+                                {currentLoadingMessage}
+                            </motion.p>
+                        </AnimatePresence>
                     </motion.div>
                 </motion.div>
             </div>
